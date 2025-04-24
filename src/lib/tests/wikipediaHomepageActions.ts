@@ -1,4 +1,6 @@
-import { Page, expect } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
+import { navigateToWikipediaHomepageWithVcr } from '../utils/testHelpers';
+import { WikipediaHomePage } from '../pages/home_page';
 
 /**
  * This test was generated using Ranger's test recording tool. The test is supposed to:
@@ -13,96 +15,67 @@ import { Page, expect } from '@playwright/test';
  * Good luck!
  */
 export async function run(page: Page, params: {}) {
-    /** STEP: Navigate to URL */
-    await page.goto('https://en.wikipedia.org/wiki/Main_Page');
+    // Create an instance of the WikipediaHomePage class
+    const homePage = new WikipediaHomePage(page);
+    
+    await navigateToWikipediaHomepageWithVcr(page);
+    
+    /** STEP: Check the total number of articles in English */
+    await test.step('Check the total number of articles in English', async () => {
+        // Use the instance method, not a static method
+        const articleCount = await homePage.getArticleCount();
 
-    /** STEP: Check the total number of articles in English */    
-    const totalArticlesLink = page.getByTitle('Special:Statistics').filter({ hasText: /\d+,\d+,\d+/ });
-    const articleCountText = await totalArticlesLink.textContent();
+        // Assert there are less than 7,000,000 articles
+        expect(
+            articleCount,
+            `Expected article count to be less than 7,000,000 but got ${articleCount}`
+        ).toBeLessThan(7000000);
+    });
     
-    // Extract the number from the text and convert to a number
-    const articleCount = parseInt(articleCountText?.replace(/,/g, '') ?? '0');
-    
-    // Assert there are less than 7,000,000 articles
-    expect(
-        articleCount, 
-        `Expected article count to be less than 7,000,000 but got ${articleCount}`
-    ).toBeLessThan(7000000);
+    /** STEP: Set text size to standard for baseline measurement */
+    await test.step('Set text size to standard for baseline', async () => {
+        await homePage.setTextSize('Standard');
+        const initialFontSize = await homePage.getFontSize();
+        console.log(`Initial font size: ${initialFontSize}px`);
+    });
 
-    // Making sure we're starting with the standard text size
-    const standardTextSizeButton = page.getByLabel('Standard').first();
-    await standardTextSizeButton.click();
-    
-    // Get the initial font size for comparison
-    const initialFontSize = await getFontSize(page);
-    console.log(`Initial font size: ${initialFontSize}px`);
+    await test.step('Test small text size', async () => {
+        // Test small text size
+        await homePage.setTextSize('Small');
+        await homePage.waitForFontSizeChange(homePage.fontSize.standard);
 
-    /** STEP: Select the 'Small' text size option in the appearance settings */
-    const smallTextSizeOption = page.getByRole('radio', { name: 'Small' });
-    await smallTextSizeOption.click();
-    
-    // Wait for the font size to change
-    await page.waitForFunction(async(targetSize) => {
-        const element = document.querySelector('.mw-body-content p');
-        return element && parseFloat(window.getComputedStyle(element).fontSize) !== targetSize;
-      }, initialFontSize);
-    
-    // Get the new font size after selecting 'Small'
-    const smallFontSize = await getFontSize(page);
-    console.log(`Small font size: ${smallFontSize}px`);
-    
-    // Assert the text got smaller
-    expect(
-        smallFontSize, 
-        `Expected font size to decrease from ${initialFontSize}px when 'Small' is selected, but got ${smallFontSize}px`
-    ).toBeLessThan(initialFontSize);
+        const smallFontSize = await homePage.getFontSize();
+        console.log(`Small font size: ${smallFontSize}px`);
 
-    /** STEP: Click the 'Large' text size option to change the display size */
-    const largeTextSizeOption = page.getByRole('radio', { name: 'Large' });
-    await largeTextSizeOption.click();
-    
-    // Wait for the font size to change
-    await page.waitForFunction(async(targetSize) => {
-        const element = document.querySelector('.mw-body-content p');
-        return element && parseFloat(window.getComputedStyle(element).fontSize) !== targetSize;
-      }, smallFontSize);
-    
-    // Get the new font size after selecting 'Large'
-    const largeFontSize = await getFontSize(page);
-    console.log(`Large font size: ${largeFontSize}px`);
-    
-    // Assert the text got larger
-    expect(
-        largeFontSize, 
-        `Expected font size to increase from ${smallFontSize}px when 'Large' is selected, but got ${largeFontSize}px`
-    ).toBeGreaterThan(smallFontSize);
+        // Assert the text got smaller
+        expect(
+            smallFontSize,
+            `Expected font size to be ${homePage.fontSize.small}px when 'Small' is selected, but got ${smallFontSize}px`
+        ).toBe(homePage.fontSize.small);
+    });
 
-    /** STEP: Click the 'Standard' text size option in the appearance settings */
-    await standardTextSizeButton.click();
-    
-    // Wait for the font size to change
-    await page.waitForFunction(async(targetSize) => {
-        const element = document.querySelector('.mw-body-content p');
-        return element && parseFloat(window.getComputedStyle(element).fontSize) !== targetSize;
-      }, largeFontSize);
-    
-    // Get the new font size after selecting 'Standard'
-    const standardFontSize = await getFontSize(page);
-    console.log(`Standard font size: ${standardFontSize}px`);
+    await test.step('Test large text size', async () => {
+        // Test large text size
+        await homePage.setTextSize('Large');
+        await homePage.waitForFontSizeChange(homePage.fontSize.small);
 
-    expect(
-        standardFontSize, 
-        `Expected font size to return ${initialFontSize}px when 'Standard' is selected, but got ${standardFontSize}px`
-    ).toEqual(initialFontSize);
-}
+        const largeFontSize = await homePage.getFontSize();
+        console.log(`Large font size: ${largeFontSize}px`);
 
-// Helper function to get the current font size of the main content
-async function getFontSize(page: Page): Promise<number> {
-    return page.evaluate(() => {
-        const element = document.querySelector('.mw-body-content p');
-        if (!element) return 0;
-        
-        const computedStyle = window.getComputedStyle(element);
-        return parseFloat(computedStyle.fontSize);
+        // Assert the text got larger
+        expect(
+            largeFontSize,
+            `Expected font size to be ${homePage.fontSize.large}px when 'Large' is selected, but got ${largeFontSize}px`
+        ).toBe(homePage.fontSize.large);
+    });
+
+    await test.step('Return to standard size', async () => {
+        // Return to standard size
+        await homePage.setTextSize('Standard');
+        const finalFontSize = await homePage.getFontSize();
+        console.log(`Final font size: ${finalFontSize}px`);
+
+        // Assert the text size is back to the initial size
+        expect(finalFontSize).toBe(homePage.fontSize.standard);
     });
 }

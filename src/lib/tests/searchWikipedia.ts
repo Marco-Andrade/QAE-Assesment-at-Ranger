@@ -1,4 +1,5 @@
-import { Page, expect } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
+import { navigateToWikipediaSearchPage } from '../utils/testHelpers';
 
 /**
  * This test was generated using Ranger's test recording tool. The test is supposed to:
@@ -18,7 +19,7 @@ import { Page, expect } from '@playwright/test';
  */
 export async function run(page: Page, params: {}) {
     /** STEP: Navigate to URL */
-    await page.goto('https://www.wikipedia.org/');
+    await navigateToWikipediaSearchPage(page);
 
     /** STEP: Enter text 'artificial' into the search input field */
     const searchInputField = page.getByRole('searchbox', {

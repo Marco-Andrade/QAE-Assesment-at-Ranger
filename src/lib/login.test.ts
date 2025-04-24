@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import dotenv from 'dotenv';
+import { navigateToWikipediaHomepage } from './utils/testHelpers';
 
 dotenv.config();
 
@@ -19,8 +20,7 @@ test('Sign in to Wikipedia', async ({ page }) => {
         throw new Error(`Need a username and password to sign in!`);
     }
 
-    // Navigate to Wikipedia
-    await page.goto('https://en.wikipedia.org/wiki/Main_Page');
+    await navigateToWikipediaHomepage(page);
     
     // Click on login link
     await page.getByRole('link', { name: 'Log in' }).click();
