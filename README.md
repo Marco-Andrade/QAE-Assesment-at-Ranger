@@ -91,7 +91,7 @@ If you run into any technical issues during the assessment, do your best to unbl
 
 ### Technical Assessment Walkthrough
 
-(Loom video)[https://www.loom.com/share/640a2a76c94b4b9c8718258ec1da03d4?sid=782af4cc-680e-4d2d-bb74-c781c3f4ded7]
+[Loom video](https://www.loom.com/share/640a2a76c94b4b9c8718258ec1da03d4?sid=782af4cc-680e-4d2d-bb74-c781c3f4ded7)
 
 ### Wikipedia Homepage Actions Test Implementation
 - Implemented the homepage actions test in `wikipediaHomepageActions.ts` featuring:
