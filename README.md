@@ -35,9 +35,15 @@ Make sure that the only files that you edit are `login.test.ts`, `searchWikipedi
     └── lib
         ├── all.test.ts
         ├── login.test.ts
+        ├── cassettes/
+        │   └── wikipedia_homepage.json
+        ├── pages/
+        │   └── home_page.ts
         ├── tests
         │   ├── searchWikipedia.ts
         │   └── wikipediaHomepageActions.ts
+        └── utils
+            └── testHelpers.ts
     └── auth
         └── login.json
 ```
@@ -80,3 +86,41 @@ npm run test
 ## Need Help?
 
 If you run into any technical issues during the assessment, do your best to unblock yourself. If you really cannot proceed or are done with the task, email megan@ranger.net.
+
+## Implementation Details
+
+### Technical Assessment Walkthrough
+
+(Loom video)[https://www.loom.com/share/640a2a76c94b4b9c8718258ec1da03d4?sid=782af4cc-680e-4d2d-bb74-c781c3f4ded7]
+
+### Wikipedia Homepage Actions Test Implementation
+- Implemented the homepage actions test in `wikipediaHomepageActions.ts` featuring:
+  - Page Object Model pattern with `WikipediaHomePage` class
+  - Accurate article count verification
+  - Text size manipulation tests (Small, Large, Standard)
+  - Precise font size measurements and assertions
+  - Proper test step organization for better readability
+  - Comprehensive logging for debugging purposes
+
+### Login Test Implementation
+- Created a robust login test in `login.test.ts` that:
+  - Uses environment variables for secure credential management
+  - Implements proper error handling for missing credentials
+  - Successfully authenticates and captures the storage state
+  - Verifies successful login through multiple assertions
+  - Saves authentication state to `src/auth/login.json` for reuse
+
+### Wikipedia Search Test Implementation
+- Completed the search test in `searchWikipedia.ts` with:
+  - Proper navigation to the Wikipedia search page
+  - Accurate search functionality for "artificial intelligence"
+  - Comprehensive assertions for page title and content
+  - Verification of the history page and latest editor
+  - Clear diagnostic messages for test failures
+
+### Test Infrastructure
+- Set up proper test environment with:
+  - VCR-like functionality for consistent test runs
+  - Proper test helpers and utilities
+  - Organized page objects for better maintainability
+  - Comprehensive test reporting
